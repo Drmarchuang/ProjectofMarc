@@ -1,0 +1,421 @@
+---
+title: "Rosenberg factorial structure analysis"
+output:
+  html_notebook: default
+  pdf_document: default
+---
+
+Individual groups analysis
+
+1. seperation by countries
+```{r}
+ROSENBERG <- read.csv("C:/Users/march/Desktop/ROSENBERG.csv", header=FALSE, stringsAsFactors=FALSE)
+colnames(ROSENBERG) <- c('gender','nation','ses1','ses2','ses3','ses4','ses5','ses6','ses7','ses8','ses9','ses10')
+US <- ROSENBERG[ROSENBERG$nation ==1,]
+CN <- ROSENBERG[ROSENBERG$nation ==2,]
+JP <- ROSENBERG[ROSENBERG$nation ==3,]
+```
+
+2. import libraries
+```{r}
+library(lavaan)
+```
+
+3. build single model
+```{r}
+GSE <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10'
+
+Bifactor <- 'pos =~ ses1+ses3+ses4+ses7+ses10
+             neg =~ ses2+ses5+ses6+ses8+ses9'
+### correlate uniqueness
+cor.neg <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10
+            ses2 ~~ ses5+ses6+ses8+ses9
+            ses5 ~~ ses6+ses8+ses9
+            ses6 ~~ ses8+ses9
+            ses8 ~~ ses9'
+cor.pos <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10
+            ses1 ~~ ses3+ses4+ses7+ses10
+            ses3 ~~ ses4+ses7+ses10
+            ses4 ~~ ses7+ses10
+            ses7 ~~ ses10'
+cor.pos.neg <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10
+                ses2 ~~ ses5+ses6+ses8+ses9
+                ses5 ~~ ses6+ses8+ses9
+                ses6 ~~ ses8+ses9
+                ses8 ~~ ses9
+                ses1 ~~ ses3+ses4+ses7+ses10
+                ses3 ~~ ses4+ses7+ses10
+                ses4 ~~ ses7+ses10
+                ses7 ~~ ses10'
+### method factor
+neg.meth <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10
+             neg =~ ses2+ses5+ses6+ses8+ses9
+             gse ~~ 0*neg'
+pos.meth <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10
+             pos =~ ses1+ses3+ses4+ses7+ses10
+             gse ~~ 0*pos'
+pos.neg <- 'gse =~ ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+ses10
+            neg =~ ses2+ses5+ses6+ses8+ses9
+            pos =~ ses1+ses3+ses4+ses7+ses10
+            gse ~~ 0*neg
+            gse ~~ 0*pos
+            neg ~~ 0*pos'
+```
+
+
+4. test model by nations
+4.1.1 US general se
+```{r}
+US.fit <- cfa(GSE, data = US, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+4.1.2 CN general se
+```{r}
+CN.fit <- cfa(GSE, data = CN, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+
+4.1.3 JP general se
+```{r}
+JP.fit <- cfa(GSE, data = JP, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+4.2.1 US Bifactor
+```{r}
+US.fit <- cfa(Bifactor, data = US, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+4.2.2 CN Bifactor
+```{r}
+CN.fit <- cfa(Bifactor, data = CN, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+4.2.3 JP Bifactor
+```{r}
+JP.fit <- cfa(Bifactor, data = JP, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+4.3.1 US negative corr
+```{r}
+US.fit <- cfa(cor.neg, data = US, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+
+4.3.2 CN negative corr
+```{r}
+CN.fit <- cfa(cor.neg, data = CN, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+
+4.3.3 JP negative corr
+```{r}
+JP.fit <- cfa(cor.neg, data = JP, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+### 
+base on modification indices, the negative method effect model fit very well with JP & US population, for CN population, it indicates there some uniqueness among positive indicators need to be correlated
+
+4.4.1 US positive corr
+```{r}
+US.fit <- cfa(cor.pos, data = US, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+
+4.4.2 CN positive corr
+```{r}
+CN.fit <- cfa(cor.pos, data = CN, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+4.4.3 JP positive corr
+```{r}
+JP.fit <- cfa(cor.pos, data = JP, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+4.5.1 US positive & negative corr
+```{r}
+US.fit <- cfa(cor.pos.neg, data = US,std.lv=T, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+ 4.5.2 CN positive & negative corr
+```{r}
+CN.fit <- cfa(cor.pos.neg, data = CN,std.lv=T, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+ 
+4.5.3 JP positive & negative corr
+```{r}
+JP.fit <- cfa(cor.pos.neg, data = JP, std.lv=T, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+### 
+pos & neg corr not converge
+
+4.6.1 US negative method
+```{r}
+US.fit <- cfa(neg.meth, data = US, estimator='ML',std.lv=T)
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+
+4.6.2 CN negative method
+```{r}
+CN.fit <- cfa(neg.meth, data = CN,std.lv=T, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+
+4.6.3 JP negative method
+```{r}
+JP.fit <- cfa(neg.meth, data = JP, std.lv=T, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+4.7.1 US positive method
+```{r}
+US.fit <- cfa(pos.meth, data = US, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+
+4.7.2 CN positive method
+```{r}
+CN.fit <- cfa(pos.meth, data = CN, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+
+4.7.3 JP positive method
+```{r}
+JP.fit <- cfa(pos.meth, data = JP, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+
+4.8.1 US pos neg method
+```{r}
+US.fit <- cfa(pos.neg, data = US, estimator='ML')
+summary(US.fit, fit.measures=T)
+US.mi <- modindices(US.fit)
+US.mi[US.mi$mi > 10,]
+```
+
+4.8.2 CN pos neg method
+```{r}
+CN.fit <- cfa(pos.neg, data = CN, estimator='ML')
+summary(CN.fit, fit.measures=T)
+CN.mi <- modindices(CN.fit)
+CN.mi[CN.mi$mi > 10,]
+```
+
+
+4.8.3 JP pos neg method
+```{r}
+JP.fit <- cfa(pos.neg, data = JP, estimator='ML')
+summary(JP.fit, fit.measures=T)
+JP.mi <- modindices(JP.fit)
+JP.mi[US.mi$mi > 10,]
+```
+
+
+MUltigroup Analysis: Measurement Equivalence
+
+Configural Invariance
+
+5.1 negative uniqueness correlated
+
+```{r}
+Mi.Fit <- cfa(cor.neg, data=ROSENBERG, group= 'nation', std.lv=T)
+summary(Mi.Fit, fit.measures =T)
+Mi.Fit.mi <- modificationindices(Mi.Fit)
+Mi.Fit.mi[Mi.Fit.mi$mi >10,]
+```
+
+
+5.2 negative method effect
+```{r}
+Mi.Fit <- cfa(neg.meth, data=ROSENBERG, group= 'nation', std.lv=T)
+summary(Mi.Fit, fit.measures =T)
+Mi.Fit.mi <- modificationindices(Mi.Fit)
+Mi.Fit.mi[Mi.Fit.mi$mi >10,]
+```
+
+
+5.3 negative & positive method
+```{r}
+Mi.Fit <- cfa(pos.neg, data=ROSENBERG, group= 'nation', std.lv=T)
+summary(Mi.Fit, fit.measures =T)
+Mi.Fit.mi <- modificationindices(Mi.Fit)
+Mi.Fit.mi[Mi.Fit.mi$mi >10,]
+```
+
+Weak Invariance
+
+6. set item 10 as refer indicator, based on results from factor ratio test
+
+```{r}
+cor.neg <- 'gse =~ NA*ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+1*ses10
+            ses2 ~~ ses5+ses6+ses8+ses9
+            ses5 ~~ ses6+ses8+ses9
+            ses6 ~~ ses8+ses9
+            ses8 ~~ ses9'
+neg.meth <- 'gse =~ NA*ses1+ses2+ses3+ses4 +ses5+ses6+ses7+ses8+ses9+1*ses10
+             neg =~ ses2+ses5+ses6+ses8+ses9
+             gse ~~ 0*neg'
+pos.neg <- 'gse =~ NA*ses1+ses2+ses3+ses4 +ses5+ses6+1*ses7+ses8+ses9+ses10
+            neg =~ ses2+ses5+ses6+ses8+ses9
+            pos =~ ses1+ses3+ses4+ses7+ses10
+            gse ~~ 0*neg
+            gse ~~ 0*pos
+            neg ~~ 0*pos'
+```
+
+
+6.1 Correlated negative indicators
+```{r}
+Wi.fit <- cfa(cor.neg, data= ROSENBERG, group='nation',group.equal='loadings')
+summary(Wi.fit, fit.measures =T)
+```
+
+
+6.2 method effect
+```{r}
+Wi.fit <- cfa(neg.meth, data= ROSENBERG, group='nation',group.equal='loadings',
+              group.partial = c('neg =~ses2',
+                                'neg =~ses5',
+                                'neg =~ses6',
+                                'neg =~ses8',
+                                'neg =~ses9'))
+summary(Wi.fit, fit.measures =T)
+```
+
+6.3 Positive & Negative method effect
+```{r}
+Wi.fit <- cfa(pos.neg, data= ROSENBERG, group='nation',group.equal='loadings',
+              group.partial = c('neg =~ses2',
+                                'neg =~ses5',
+                                'neg =~ses6',
+                                'neg =~ses8',
+                                'neg =~ses9',
+                                'pos =~ses1',
+                                'pos =~ses3',
+                                'pos =~ses4',
+                                'pos =~ses7',
+                                'pos =~ses10'))
+summary(Wi.fit, fit.measures =T)
+```
+
+No converge
+
+Strict Invariance
+
+7.1 correlated negative indicator
+```{r}
+Si.fit <-cfa(cor.neg, data= ROSENBERG, group='nation',group.equal=c('loadings','intercepts'))
+summary(Si.fit, fit.measures =T)
+```
+
+
+7.2 Negative method
+```{r}
+Si.fit <-cfa(neg.meth, data= ROSENBERG, group='nation',group.equal=c('loadings','intercepts'))
+summary(Si.fit, fit.measures =T)
+```
+
+
+7.3 Negative and Positive method
+```{r}
+Si.fit <- cfa(pos.neg, data= ROSENBERG, group='nation',group.equal=c('loadings','intercepts'),
+              group.partial = c('neg =~ses2',
+                                'neg =~ses5',
+                                'neg =~ses6',
+                                'neg =~ses8',
+                                'neg =~ses9',
+                                'pos =~ses1',
+                                'pos =~ses3',
+                                'pos =~ses4',
+                                'pos =~ses7',
+                                'pos =~ses10'))
+summary(Si.fit, fit.measures =T)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

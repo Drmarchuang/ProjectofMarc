@@ -8,6 +8,7 @@ import libraries
 ```{r}
 library(simsem)
 library(lavaan)
+# alignment method
 source('https://raw.githubusercontent.com/MaksimRudnev/AlignmentMplusAutomation/master/source_repo.R')
 ```
 
@@ -22,6 +23,8 @@ no.meth <- 'constr =~ y1 + y2 +y3 + y4 + y5 + y6'
 meth <- 'constr =~ y1 + y2 +y3 + y4 + y5 + y6
          meth =~ y4 + y5 + y6
         meth ~~ 0*constr'
+        
+# model for alignment method
 meth.cor <- 'constr =~ y1 + y2 +y3 + y4 + y5 + y6
             y4 ~~ y5 + y6
             y5 ~y6'
@@ -159,6 +162,12 @@ fit <- cfa(meth, data = all.data, group= 'nation',
 summary(fit)
 ```
 
+3.4 information extraction
+```{r}
+para <- parameterestimates(fit)
+constr <- para[which(para$lhs =='constr'& para$op== '~1'),]
+constr <- constr[,c('group','est','se')]
+```
 
 
 

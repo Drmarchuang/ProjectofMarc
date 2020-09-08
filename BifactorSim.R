@@ -49,7 +49,7 @@ BifactorSim <- function(type= 'no.meth',               # no.meth, one.meth, two.
     loadingVals <- matrix(0,6,2)
     loadingVals[1:6,1] <- .7
     loadingVals[4:6,2] <- meth.loadings
-    LY = bind(loading, loadingVals)
+    LY = bind(loadings, loadingVals)
     
     latent.cov <- matrix(0,2,2)
     diag(latent.cov) <- NA
@@ -61,9 +61,10 @@ BifactorSim <- function(type= 'no.meth',               # no.meth, one.meth, two.
     
     factor.mean <- c(NA,NA)
     AL.1 <- bind(factor.mean,c(0,'runif(1,-1,1)')) 
-    AL.2 <- bind(factor.mean,c(mean.dif, 'runif(1,-1,1'))
+    AL.2 <- bind(factor.mean,c(mean.dif,'runif(1,-1,1)')) 
     model.1 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.1, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth'))
     model.2 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.2, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth'))
+    
   }else if(type == 'two.meth'){
     loadings <- matrix(0,6,3)
     loadings[1:6,1] <- NA
@@ -72,7 +73,7 @@ BifactorSim <- function(type= 'no.meth',               # no.meth, one.meth, two.
     loadingVals <- matrix(0,6,3)
     loadingVals[1:6,1] <- .7
     loadingVals[1:3,2] <- meth.loadings
-    loadingVals[4:6,3] <- meth.loaindgs
+    loadingVals[4:6,3] <- meth.loadings
     LY = bind(loadings,loadingVals)
     
     latent.cov <- matrix(0,3,3)
@@ -84,58 +85,62 @@ BifactorSim <- function(type= 'no.meth',               # no.meth, one.meth, two.
     RTE <- binds(error.cov)
     
     factor.mean <- c(NA,NA,NA)
-    AL.1 <- bind(factor.mean,c(0,'runif(1,-1,1)'),'runif(1,-1,1)') 
-    AL.2 <- bind(factor.mean,c(mean.dif, 'runif(1,-1,1'),'runif(1,-1,1)')
+    AL.1 <- bind(factor.mean,c(0,'runif(1,-1,1)','runif(1,-1,1)')) 
+    AL.2 <- bind(factor.mean,c(mean.dif, 'runif(1,-1,1)','runif(1,-1,1)'))
     model.1 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.1, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth1','meth2'))
     model.2 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.2, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth1','meth2'))
   }else if(type == 'interact'){
     # group 1
-    loadings.1 <- matrix(0,6,2)
-    loadings.1[1:6,1] <- NA
-    loadings.1[4:6,2] <- NA
-    loadingVals.1 <- matrix(0,6,2)
-    loadingVals.1[1:6,1] <- .7
-    loadingVals.1[4:6,2] <- meth.loadings
-    LY = bind(loading.1, loadingVals.1)
+    loadings <- matrix(0,6,2)
+    loadings[1:6,1] <- NA
+    loadings[4:6,2] <- NA
+    loadingVals <- matrix(0,6,2)
+    loadingVals[1:6,1] <- .7
+    loadingVals[4:6,2] <- meth.loadings
+    LY = bind(loadings, loadingVals)
     
-    latent.cov.1 <- matrix(0,2,2)
-    diag(latent.cov.1) <- NA
+    latent.cov <- matrix(0,2,2)
+    diag(latent.cov) <- NA
     RPS <- binds(latent.cov,1)
     
     error.cov <- matrix(0,6,6)
     diag(error.cov) <- 1
     RTE <- binds(error.cov)
     
-    factor.mean.1 <- c(NA,NA)
+    factor.mean <- c(NA,NA)
     AL.1 <- bind(factor.mean,c(0,'runif(1,-1,1)')) 
+    model.1 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.1, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth'))
+    
     
     # group 2
     loadings.2 <- matrix(0,6,3)
     loadings.2[1:6,1] <- NA
     loadings.2[1:3,2] <- NA
-    loadings.2[4:6,2] <- NA
+    loadings.2[4:6,3] <- NA
     loadingVals.2 <- matrix(0,6,3)
     loadingVals.2[1:6,1] <- .7
     loadingVals.2[1:3,2] <- meth.loadings
-    loadingVals.2[4:6,3] <- meth.loaindgs
-    LY = bind(loadings.2,loadingVals.2)
+    loadingVals.2[4:6,3] <- meth.loadings
+    LY.2 = bind(loadings.2,loadingVals.2)
     
     latent.cov.2 <- matrix(0,3,3)
     diag(latent.cov.2) <- NA
-    RPS <- binds(latent.cov.2,1)
+    RPS.2 <- binds(latent.cov.2,1)
     
     factor.mean.2 <- c(NA,NA,NA)
-    AL.2 <- bind(factor.mean.2,c(mean.dif, 'runif(1,-1,1'),'runif(1,-1,1)')
+    AL.2 <- bind(factor.mean.2,c(mean.dif, 'runif(1,-1,1)','runif(1,-1,1)'))
     
-    model.1 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.1, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth1'))
-    model.2 <- model.cfa(LY=LY, RPS = RPS, RTE= RTE, AL= AL.2, indLab=c('y1','y2','y3','y4','y5','y6'), facLab = c('constr', 'meth1','meth2'))
+    model.2 <- model.cfa(LY=LY.2, RPS = RPS.2, RTE= RTE, AL= AL.2, indLab=c('y1','y2','y3','y4','y5','y6'))
   }
+  
+  print('simulation model created')
   
   # generate a new dataframe
   est <- rep(0,1000)
   se <- rep(0,1000)
   store <- data.frame(est,se)
   
+  print('data simulation begins')
   
   # monte carlo simuation
   for (i in 1:1000){
@@ -163,7 +168,6 @@ BifactorSim <- function(type= 'no.meth',               # no.meth, one.meth, two.
   print(round((end.time - start.time),2))
   return(store)
 }
-
 
 
 
